@@ -23,6 +23,8 @@ var app = express();
 app.set('port', process.env.PORT || 3000);
 app.set('view engine', 'ejs');
 
+/* comment */
+
 // Stuff to do for all routes
 app.use(cookieParser()); // Needed for the session part to work
 app.use(express_session({secret: 'OMG_bigSecretL33tz0rs', resave: true,	saveUninitialized: true})); // Define a session framework with a "secret"
