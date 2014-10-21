@@ -50,7 +50,7 @@ app.get('/unset', function(req, res)
 
 app.post('/test', function(req, res)
 {
-	var name = req.body.pass;
+	var name = req.body.name;
 	res.write(name + '\n');
 	res.end();
 });
