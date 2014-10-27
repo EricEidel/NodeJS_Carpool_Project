@@ -1,0 +1,13 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    if user
+      div(style="position:absolute;top:0px;right:0px;background-color:#bef;font-size:.75em;padding:.25em;border-radius:.5em")
+        span Logged in as: 
+        span=user.displayName
+        a(href="/logout")
+          button Logout
+    block content

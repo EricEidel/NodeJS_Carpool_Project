@@ -1,0 +1,30 @@
+extends layout
+
+block content
+
+  div(style="margin:0px auto;width:400px")
+    h1= title
+    p Welcome to Bluepages Login
+    if user
+      div Welcome #{user.username}
+    else
+      form(action="/login", method="post")
+        table
+          tr
+            td
+              label Username:
+            td
+              input(type="text", name="username")
+          tr
+            td
+              label Password:
+            td
+              input(type="password", name="password")
+          tr
+            td
+            td(align="right")
+              input(type="submit", value="Log In")
+      if reason
+        div(style="margin:1em 1em 0 0")
+          span(style="background-color:#FF9999;padding:.25em;border-radius:.25em;") Unable to log in, bad email or password
+  

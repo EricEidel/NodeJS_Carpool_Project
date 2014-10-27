@@ -1,0 +1,5 @@
+1) Go into the folder that is the root folder (CarpoolProject).
+2) cf api https://api.ng.bluemix.net (or the staged link)
+3) cf login -u eidelber@ca.ibm.com
+4) cf target -o eidelber@ca.ibm.com -s dev
+5) cf push CarpoolProject -b nodejs_buildpack (-b buildpack is important as fuck)

@@ -10,10 +10,46 @@ var path = require('path');
 var express = require('express');   // The ExpressJS framework
 var cookieParser = require('cookie-parser');
 var express_session = require('express-session'); 
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+var passport = require('passport');
+var LDAPStrategy = require('./lib/passport-ldap');
+var permissions = require('./lib/permissions');
 
-// My adapter
-var modelAdapter = require('./models/adapter');
+var routes = require('./routes');
+var user = require('./routes/user');
+
+/**
+ * Setting up the authontication
+**/
+passport.use(new LDAPStrategy({
+    server: {
+      url: 'ldaps://bluepages.ibm.com:636'
+    },
+    base: 'o=ibm.com,ou=bluepages',
+    search: {
+      filter: 'ou=bluepages,o=ibm.com',
+     },
+    debug:true
+  },
+  function(person, done) {
+    return done(null, {
+        username:person.mail,
+        provider:"ldap",
+        id: person.serialNumber || person.uid,
+        notesId : person.notesId,
+        cn: person.cn,
+        displayName: person.callupName
+    });
+  }
+));
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+      done(null,user);
+});
 
 /**
  * Setup the Express engine
@@ -23,28 +59,50 @@ var app = express();
 app.set('port', process.env.PORT || 3000);
 app.set('view engine', 'ejs');
 
+
 /* comment */
 
-// Stuff to do for all routes
+// App.use
 app.use(cookieParser()); // Needed for the session part to work
 app.use(express_session({secret: 'OMG_bigSecretL33tz0rs', resave: true,	saveUninitialized: true})); // Define a session framework with a "secret"
 app.use(express.static(path.join(__dirname, 'views'))); // Makes all the content in "public" accessible
 app.use( bodyParser.json() );       // to support JSON-encoded bodies ({"name":"foo","color":"red"} <- JSON encoding)
 app.use( bodyParser.urlencoded({ extended: true }) ); // to support URL-encoded bodies (name=foo&color=red <- URL encoding)
 
-app.get('/log_in', function (req, res)
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// Authentication
+
+// If user is not logged in, go to /, otherwise do the function.
+app.get('/', permissions.isUserNotLoggedIn('/test'), function(req, res)
 {
-	req.session.userName = 'omg';
-	res.render('home.ejs');
+	// Only happens if user is not logged in
+	res.redirect('/');
 });
 
+app.post('/',
+  passport.authenticate('ldap', {
+    successReturnToOrRedirect: '/test',
+    failureRedirect: '/?reason=failed'
+  })
+);
+
+app.get('/logout', function(req, res){
+  req.logout();
+  delete req.session.user;
+  
+  res.redirect('/');
+});
+
+
+// Sessions examples
 app.get('/set', function(req, res)
 {
-	req.session.userName = 'omg';
+	req.session.userName = req.user.userName;
 	res.redirect('/test');
 });
-
-//commit
 
 app.get('/unset', function(req, res)
 {
@@ -52,19 +110,16 @@ app.get('/unset', function(req, res)
 	res.redirect('/test');
 });
 
-app.post('/test', function(req, res)
-{
-	var name = req.body.name;
-	res.write(name + '\n');
-	res.end();
-});
-
 app.get('/test', function(req, res)
 {
-	res.write('this is the test page!\n');
-	res.write(__dirname + '<br>');
-	if (req.session.userName)
-		res.write(req.session.userName);
+	if (req.session.user)
+	{
+		res.write(req.session.user.username);
+		res.write(req.session.user.cn[0]);
+	}
+	else
+		res.write("No user logged in");
+
 	res.end();
 });
 
