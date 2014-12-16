@@ -11,16 +11,28 @@ var express = require('express');   // The ExpressJS framework
 var cookieParser = require('cookie-parser');
 var express_session = require('express-session'); 
 var bodyParser = require('body-parser');
+var routes = require('./routes');
+var index = require('./routes/index');
+var user = require('./routes/user');
+
+var ibmdb = require('ibm_db');
+
 var passport = require('passport');
 var LDAPStrategy = require('./lib/passport-ldap');
 var permissions = require('./lib/permissions');
 
-var routes = require('./routes');
-var user = require('./routes/user');
+/**
+ * Setup the Express engine
+**/
+var app = express();
+
+app.set('port', process.env.PORT || 3000);
+app.set('view engine', 'ejs');
 
 /**
  * Setting up the authontication
 **/
+
 passport.use(new LDAPStrategy({
     server: {
       url: 'ldaps://bluepages.ibm.com:636'
@@ -48,30 +60,30 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-      done(null,user);
+    done(null,user);
 });
 
-/**
- * Setup the Express engine
-**/
-var app = express();
+var db_name = "fbservices";
+var user_name = "db2inst1";
+var password = "1234";
+var hostname = "futureblue.torolab.ibm.com";
+var port = "50000";
 
-app.set('port', process.env.PORT || 3000);
-app.set('view engine', 'ejs');
-
-
-/* comment */
+var dsnString = "DRIVER={DB2};DATABASE=" + db_name 
+              + ";UID=" + user_name
+              + ";PWD=" + password
+              + ";HOSTNAME=" + hostname
+              + ";port=" + port;
 
 // App.use
 app.use(cookieParser()); // Needed for the session part to work
 app.use(express_session({secret: 'OMG_bigSecretL33tz0rs', resave: true,	saveUninitialized: true})); // Define a session framework with a "secret"
 app.use(express.static(path.join(__dirname, 'views'))); // Makes all the content in "public" accessible
-app.use( bodyParser.json() );       // to support JSON-encoded bodies ({"name":"foo","color":"red"} <- JSON encoding)
-app.use( bodyParser.urlencoded({ extended: true }) ); // to support URL-encoded bodies (name=foo&color=red <- URL encoding)
+app.use( bodyParser.json() );       // to support JSON-encoded bodies ( {"name":"foo","color":"red"} <- JSON encoding )
+app.use( bodyParser.urlencoded({ extended: true }) ); // to support URL-encoded bodies ( name=foo&color=red <- URL encoding )
 
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 // Authentication
 
@@ -122,6 +134,11 @@ app.get('/test', function(req, res)
 
 	res.end();
 });
+
+
+// Load home page
+app.get('/get_form', index.get_form);
+app.post('/post_form', index.post_form);
 
 
 /**
