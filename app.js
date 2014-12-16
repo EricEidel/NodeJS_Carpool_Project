@@ -82,9 +82,6 @@ app.use(express.static(path.join(__dirname, 'views'))); // Makes all the content
 app.use( bodyParser.json() );       // to support JSON-encoded bodies ( {"name":"foo","color":"red"} <- JSON encoding )
 app.use( bodyParser.urlencoded({ extended: true }) ); // to support URL-encoded bodies ( name=foo&color=red <- URL encoding )
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Authentication
 
 // If user is not logged in, go to /, otherwise do the function.
@@ -134,7 +131,6 @@ app.get('/test', function(req, res)
 
 	res.end();
 });
-
 
 // Load home page
 app.get('/get_form', index.get_form);
