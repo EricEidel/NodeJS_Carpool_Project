@@ -1,0 +1,20 @@
+WHAT NEED TO DO:
+
+1) Log in page (Nicified).
+
+On log in action, server sends the following information:
+
+{
+	"type":"login_info",
+	"user_name":"Eric",
+	"groups_managed":[1,2,3]
+}
+
+2) Landing page -> 3 actions:
+	2.1) Create a group
+	2.2) Look up groups
+	2.3) Manage groups user already has
+	
+
+3) Create a group -> A form that sends the "create_group" message to the server. Responses are NULL or "Error". If null, prompt user "success", if error, tell the user. On ok go back to landing page.
+4) Look up groups -> A table that populated by the response from the server. A click on this sends the "list_groups" request and then populates the table with the answer.

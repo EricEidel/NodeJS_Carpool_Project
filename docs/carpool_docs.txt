@@ -1,0 +1,149 @@
+When log in, server sends:
+
+1) User full name.
+2) Groups the user have created
+3) Groups the user have joined previously.
+
+
+messages FROM front end to back end:
+
+GET USER GROUPS INFO
+{
+	"type":"get_user_groups"
+}
+ANSWER: "list_groups" | "error"
+
+CREATE GROUP:
+{
+	"type":"create_group",
+	"from":"somewhere",
+	"to":"somewhere else",
+	"which_days":"T/F",
+	"number_of_seats":"5",
+	"time":"17:00"
+}
+ANSWER: NULL or "error"
+
+
+MODIFY GROUP:
+{
+	"type":"modify_group",
+	"gid":"2",
+	"from":"somewhere",
+	"to":"somewhere else",
+	"which_days":"T/F",
+	"number_of_seats":"5",
+	"time":"17:00"
+}
+ANSWER: NULL or "error"
+
+DELETE GROUP:
+{
+	"type":"delete_group",
+	"gid":"2"
+}
+ANSWER: NULL or "error"
+
+MANAGE A GROUP:
+==============================
+LIST PASANGERS
+{
+	"type":"get_list_passangers",
+	"gid":"2"
+}
+ANSWER: "list_passangers" or "error"
+
+ACCEPT PASSANGER:
+{
+	"type":"accept_passanger",
+	"gid":"2",
+	"PID":"1"
+}
+ANSWER: NULL or "error"
+
+DECLINE PASSANGER:
+{
+	"type":"decline_passanger",
+	"gid":"2",
+	"PID":"1"
+}
+ANSWER: NULL or "error"
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+REQUEST TO JOIN A CARPOOL GROUP:
+{
+	"type":"request_to_join",
+	"gid":"2"
+}
+ANSWER: NULL or "error"
+
+REQUEST TO LEAVE A CARPOOL GROUP:
+{
+	"type":"request_to_leave",
+	"gid":"2"
+}
+ANSWER: NULL or "error"
+
+GET GROUP INFO
+{
+	"type":"get_group",
+	"gid":"2"
+}
+ANSWER: "list_groups" or "error"
+
+Messages sent TO the front end:
+LIST GROUPS:
+{
+	"type":"list_groups",
+	"groups" : 
+	{
+		"1":
+		{
+			"from":"somewhere",
+			"to":"somewhere else",
+			"admin":"Amir",
+			"which_days":"T/F",
+			"number_of_seats":"5",
+			"time":"17:00"
+		},
+		"2":
+		{
+			"from":"somewhere",
+			"to":"somewhere else",
+			"admin":"Eric",
+			"which_days":"T/F",
+			"number_of_seats":"5",
+			"time":"17:00"
+		}
+	}
+}
+
+LIST PASSANGERS:
+{
+	"type":"list_passangers",
+	"passangers":
+	{
+		"(pid)1":
+		{
+			name:"Eric",
+			status:"Accepted"
+		},
+		"(pid)2":
+		{
+			name:"Amir",
+			status:"Pending"
+		},	
+		"(pid)3":
+		{
+			name:"Bob",
+			status:"Declined"
+		},	
+	}
+}
+
+ERROR:
+{
+	"type":"error",
+	"reason":"..."
+}

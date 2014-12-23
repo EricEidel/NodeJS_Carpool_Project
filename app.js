@@ -56,7 +56,7 @@ passport.deserializeUser(function(id, done) {
 **/
 var app = express();
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 80);
 app.set('view engine', 'ejs');
 
 
@@ -65,7 +65,7 @@ app.set('view engine', 'ejs');
 // App.use
 app.use(cookieParser()); // Needed for the session part to work
 app.use(express_session({secret: 'OMG_bigSecretL33tz0rs', resave: true,	saveUninitialized: true})); // Define a session framework with a "secret"
-app.use(express.static(path.join(__dirname, 'views'))); // Makes all the content in "public" accessible
+app.use(express.static(path.join(__dirname, 'public'))); // Makes all the content in "public" accessible
 app.use( bodyParser.json() );       // to support JSON-encoded bodies ({"name":"foo","color":"red"} <- JSON encoding)
 app.use( bodyParser.urlencoded({ extended: true }) ); // to support URL-encoded bodies (name=foo&color=red <- URL encoding)
 
@@ -75,16 +75,9 @@ app.use(passport.session());
 
 // Authentication
 
-// If user is not logged in, go to /, otherwise do the function.
-app.get('/', permissions.isUserNotLoggedIn('/test'), function(req, res)
-{
-	// Only happens if user is not logged in
-	res.redirect('/');
-});
-
-app.post('/',
+app.post('/log_in',
   passport.authenticate('ldap', {
-    successReturnToOrRedirect: '/test',
+    successReturnToOrRedirect: '/landing_page',
     failureRedirect: '/?reason=failed'
   })
 );
@@ -94,6 +87,30 @@ app.get('/logout', function(req, res){
   delete req.session.user;
   
   res.redirect('/');
+});
+
+app.get('/landing_page', function(req, res){
+	if (!req.session.user)
+		res.redirect('/');
+	else
+		res.render('landingPage');
+});
+
+app.get('/create_group', function(req, res){
+	if (!req.session.user)
+		res.redirect('/');
+	else
+		res.render('create_group');
+});
+
+app.post('/create_group', function(req, res){
+	if (!req.session.user)
+		res.redirect('/');
+	else
+	{
+		req.write(req.input.gid);
+		req.end();
+	}
 });
 
 
