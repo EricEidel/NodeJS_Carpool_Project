@@ -8,3 +8,5 @@ applications:
   host: carpool_project_1
   path: .     
   command: node app.js
+  services:
+  - SQL Database-w8
