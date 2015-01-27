@@ -17,7 +17,9 @@ var permissions = require('./lib/permissions');
 
 var routes = require('./routes');
 var user = require('./routes/user');
+var index = require('./routes/index');
 
+var ibm_db = require('ibm_db');
 /**
  * Setting up the authontication
 **/
@@ -97,20 +99,19 @@ app.get('/landing_page', function(req, res){
 });
 
 app.get('/create_group', function(req, res){
-	if (!req.session.user)
-		res.redirect('/');
-	else
+//	if (!req.session.user)
+//		res.redirect('/');
+//	else
 		res.render('create_group');
 });
 
 app.post('/create_group', function(req, res){
-	if (!req.session.user)
-		res.redirect('/');
-	else
-	{
-		req.write(req.input.gid);
-		req.end();
-	}
+//	if (!req.session.user)
+//		res.redirect('/');
+//	else
+//	{
+		index.post_form(req, res);
+//	}
 });
 
 
